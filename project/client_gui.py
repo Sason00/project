@@ -1,32 +1,29 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile
 import pages.code.main_page_copy
 import pages.code.not_a_guide_buy_license
 
 # C:\Users\Ariel\AppData\Roaming\Python\Python311\Scripts\pyside6-uic.exe
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+app = QApplication(sys.argv)
 
-        # Create a QStackedWidget and add the screens to it
-        self.stacked_widget = QStackedWidget()
-        self.stacked_widget.addWidget(pages.code.main_page_copy.Ui_Form())
-        self.stacked_widget.addWidget(pages.code.not_a_guide_buy_license.Ui_MainWindow())
+loader = QUiLoader()
 
-        # Set the main window's central widget to the stacked widget
-        self.setCentralWidget(self.stacked_widget)
+ui_file = QFile("pages/main_page.ui")
+ui_file.open(QFile.ReadOnly)
+my_form = loader.load(ui_file)
+ui_file.close()
 
-    def switch_to_main_page(self):
-        # Switch to the main page
-        self.stacked_widget.setCurrentWidget(self.stacked_widget.widget(0))
+ui_file2 = QFile("pages/create_room_page.ui")
+ui_file2.open(QFile.ReadOnly)
+my_form2 = loader.load(ui_file2)
+ui_file2.close()
 
-    def switch_to_not_a_guide_buy_license(self):
-        # Switch to the "not a guide, buy a license" page
-        self.stacked_widget.setCurrentWidget(self.stacked_widget.widget(1))
+sw = QStackedWidget()
+sw.addWidget(my_form)
+sw.addWidget(my_form2)
+my_form.create_new_room_button.clicked.connect(lambda: sw.setCurrentIndex(1))
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
+sw.show()
