@@ -143,6 +143,13 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
+           <widget class="QPushButton" name="leave_room_button">
+            <property name="text">
+             <string>Leave room</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButton_2">
             <property name="text">
              <string>Change name</string>

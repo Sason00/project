@@ -33,5 +33,6 @@ sw.addWidget(my_form2)
 sw.addWidget(my_form3)
 my_form.create_new_room_button.clicked.connect(lambda: sw.setCurrentIndex(1))
 my_form.connect_button.clicked.connect(lambda: sw.setCurrentIndex(2))
+my_form3.leave_room_button.clicked.connect(lambda: sw.setCurrentIndex(0))
 
 sw.show()
