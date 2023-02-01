@@ -5,6 +5,9 @@ from PySide6.QtCore import QFile
 import pages.code.main_page_copy
 import pages.code.not_a_guide_buy_license
 
+import os
+os.environ["PYSIDE_DESIGNER_PLUGINS"] = r"C:\Users\Ariel\AppData\Roaming\Python\Python311\site-packages\PySide6"
+
 # C:\Users\Ariel\AppData\Roaming\Python\Python311\Scripts\pyside6-uic.exe
 
 app = QApplication(sys.argv)

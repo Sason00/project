@@ -1,0 +1,35 @@
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    type TEXT NOT NULL,
+    room_code TEXT DEFAULT NULL,
+    host_ip TEXT DEFAULT NULL,
+    host_port INTEGER DEFAULT NULL
+);
+
+DROP TABLE table_name;
+
+
+
+DELETE FROM users WHERE 1;
+
+
+CREATE TABLE active_rooms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    room_code TEXT NOT NULL UNIQUE,
+    host_id INTEGER NOT NULL,
+    FOREIGN KEY (host_id) REFERENCES users(id)
+);
+
+ALTER TABLE active_rooms
+ADD COLUMN host_ip TEXT DEFAULT NULL,
+ADD COLUMN host_port INTEGER DEFAULT NULL;
+
+ALTER TABLE active_rooms
+RENAME COLUMN host_id TO host_ip;
+
+
+INSERT INTO active_rooms (room_code, host_id)
+VALUES ('room1', 1);
