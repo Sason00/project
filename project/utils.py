@@ -2,6 +2,7 @@ import secrets
 import socket
 import subprocess
 import platform
+import pickle
 
 
 def get_ipv4_address():
@@ -38,13 +39,14 @@ def get_port_and_ip():
     public_ip = get_ipv4_address()
     return (public_ip, port)
 
+ip, port = get_port_and_ip()
 
 def create_room_id():
     return secrets.token_urlsafe(6)
 
 def create_user(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com", "type": "guide"}):
     # Create the data to send
-    ip, port = utils.get_port_and_ip()
+    ip, port = get_port_and_ip()
     data = {"command": "create user", "data": user_data} 
     # Pickle the data
     data = pickle.dumps(data)
@@ -72,7 +74,7 @@ def create_user(user_data={"username": "first2", "password": "123", "email": "ch
 
 def send_login(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com", "type": "guide"}):
     # Create the data to send
-    ip, port = utils.get_port_and_ip()
+    ip, port = get_port_and_ip()
     data = {"command": "login", "data": user_data}
     # Pickle the data
     data = pickle.dumps(data)
@@ -83,20 +85,18 @@ def send_login(user_data={"username": "first2", "password": "123", "email": "che
     # Send the data to the server
     sock.sendto(data, ("localhost", 5005))
 
-
     # Wait for the response
     response_pickled, addr = sock.recvfrom(1024)
 
     # Unpickle the response
     response = pickle.loads(response_pickled)
-
-    # Print the response
-    print(response["message"])
-    print("Code: ", response["code"])
-
-
+    
     # Close the socket
     sock.close()
+
+    return response
+
+
 
 def activate_room(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com"}, data={"host_ip": ip, "host_port": port}):
     ip, port = get_port_and_ip()
@@ -113,6 +113,11 @@ def activate_room(user_data={"username": "first2", "password": "123", "email": "
     
 
 if __name__ == "__main__":
-	print(create_room_id())
-	print(type(create_room_id()))
-	print(get_port_and_ip())
+    pass
+"""
+    print(create_room_id())
+    print(type(create_room_id()))
+    print(get_port_and_ip())
+"""
+
+
