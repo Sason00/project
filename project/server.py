@@ -7,12 +7,17 @@ import json
 import re
 import utils
 
+"""
+todo list:
+make every sql to use "with"
+"""
+
 salt = b'your_salt'
 
 # Function to handle incoming connections
 def handle_connection(data, addr):
     # Unjson the data
-    data = json.loads(data.decode())
+    data = json.loads(data.decode(), strict=False)
     print(data, addr)
     # example {"command": "create user", "data": {"username": "first2", "password": "123", "email": "check6@gmail.com", "type": "guide"}}
     # Check the command
@@ -87,6 +92,30 @@ def handle_connection(data, addr):
         insert_room(room_code, user_id, host_ip, host_port)
         # Return success message to client
         send_response(addr, {"message": "Room successfully opened.", "code": 200})
+    elif data["command"] == "close room":
+        user_info = data["user_info"]
+        user_id = login(user_info["password"], user_info["email"])
+        if user_id is None:
+            # Return error message to client
+            send_response(addr, {"message": "Invalid password or mail.", "code": 401})
+            return
+        user_type = get_user_type(user_id)
+        if user_type != "guide":
+            # Return error message to client
+            send_response(addr, {"message": "You are not authorized to open a room.", "code": 403})
+            return
+        with sqlite3.connect("mydatabase.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM active_rooms WHERE id=?;", (user_id, ))
+            connection.commit()
+            send_response(addr, {"message": "Room was closed successfully", "code": 204})
+    elif data["command"] == "get host by code":
+        room_code = data["room_code"]
+        conn = sqlite3.connect("mydatabase.db")
+        c = conn.cursor()
+        c.execute("SELECT host_ip, host_port FROM active_rooms WHERE room_code = ?", (room_code, ))
+        host_ip, host_port = c.fetchone()
+        send_response(addr, {"message": "Here are the host ip and port", "code": 200, "host ip": host_ip, "host port": host_port})    
     else:
         print(data["command"], data["command"] == "open room")
         send_response(addr, {"message": "Invalid command.", "code": 400})
@@ -146,12 +175,23 @@ def get_user_type(user_id):
 def receive_data():
     while True:
         # Receive data from the socket
-        data, addr = sock.recvfrom(1024)
+        # data, addr = sock.recvfrom(1024)
+        data = b""
+        while True:
+            chunk, addr = sock.recvfrom(1024*2)
+            data += chunk
+            if len(chunk) < 1024:
+                # end of message
+                break
+        print(data, "hi")
         # Start a new thread to handle the connection
         threading.Thread(target=handle_connection, args=(data, addr)).start()
 
 # Create a socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+# set the buffer size to 4096 bytes
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1048576)
 
 # Bind the socket to the address and port
 sock.bind(("localhost", 5005))
