@@ -1,5 +1,6 @@
 import sys
 import utils
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLineEdit
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
@@ -15,7 +16,10 @@ display name and type
 create room
 """
 
+client = utils.Client(None, None, None)
+
 app = QApplication(sys.argv)
+app.setWindowIcon(QIcon('icon.png'))
 
 loader = QUiLoader()
 
@@ -67,7 +71,8 @@ def login():
     mail = my_form4.email_field.text()
     password = my_form4.password_field.text()
     data = {"password": password, "email": mail}
-    r = utils.send_login(data)
+    client.change_user(None, mail, password)
+    r = client.send_login()
     print(r)
 
 
@@ -79,13 +84,16 @@ def create_new_user():
     print(name, mail, password, user_type)
     data = {"username": name, "password": password, "email": mail, "type": user_type}
     print(data)
-    r = utils.create_user(data)
+    client.change_user(None, mail, password)
+    r = client.create_user(data)
     print(r)
 
 
 my_form.create_new_room_button.clicked.connect(lambda: sw.setCurrentIndex(1))
 my_form.connect_button.clicked.connect(lambda: sw.setCurrentIndex(2))
 my_form.login_button.clicked.connect(lambda: sw.setCurrentIndex(3))
+
+my_form2.return_button.clicked.connect(lambda: sw.setCurrentIndex(0))
 
 my_form3.leave_room_button.clicked.connect(lambda: sw.setCurrentIndex(0))
 

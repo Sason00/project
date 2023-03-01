@@ -178,6 +178,51 @@ def get_host(room_code=""):
     r = send_data(data)
     return r
 
+
+class Client:
+    def __init__(self, username=None, password=None, email=None):
+        if not(password is None or email is None):
+            self.username = username
+            self.password = password
+            self.email = email
+            self.user_data = {"username": self.username, "password": self.password, "email": self.email}
+        else:
+            self.user_data = None
+
+    def change_user(self, username=None, password=None, email=None):
+        if not(password is None or email is None):
+            self.username = username
+            self.password = password
+            self.email = email
+            self.user_data = {"username": self.username, "password": self.password, "email": self.email}
+        else:
+            self.user_data = None
+
+    def activate_room(self, data={"host_ip": ip, "host_port": port}):
+        if self.user_data != None:
+            return activate_room(self.user_data, data)
+        return {"message": "You are not logged in"}
+
+    def close_room(self):
+        if self.user_data != None:
+            return close_room(user_data)
+        return {"message": "You are not logged in"}
+
+    def send_login(self):
+        if self.user_data != None:
+            return send_login(self.user_data)
+        return {"message": "You are not logged in"}
+
+    def create_user(self, data):
+        if self.user_data != None:
+            self.change_user(data["username"], data["password"], data["email"])
+            return create_user(data)
+        return {"message": "username or password or mail are not valid"}
+
+    def get_host(self, room_code):
+        return get_host(room_code)
+        
+
 if __name__ == "__main__":
     print(get_port_and_ip())
 """

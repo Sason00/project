@@ -30,7 +30,7 @@ def handle_connection(data, addr):
         salted_password = hashlib.sha256(password + salt).hexdigest()
 
         # Check if email is valid
-        email_regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        email_regex = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
        
         if re.search(email_regex, user_data["email"]):
             # Connect to the database
@@ -111,11 +111,11 @@ def handle_connection(data, addr):
             send_response(addr, {"message": "Room was closed successfully", "code": 204})
     elif data["command"] == "get host by code":
         room_code = data["room_code"]
-        conn = sqlite3.connect("mydatabase.db")
-        c = conn.cursor()
-        c.execute("SELECT host_ip, host_port FROM active_rooms WHERE room_code = ?", (room_code, ))
-        host_ip, host_port = c.fetchone()
-        send_response(addr, {"message": "Here are the host ip and port", "code": 200, "host ip": host_ip, "host port": host_port})    
+        with sqlite3.connect("mydatabase.db") as conn:
+            c = conn.cursor()
+            c.execute("SELECT host_ip, host_port FROM active_rooms WHERE room_code = ?", (room_code, ))
+            host_ip, host_port = c.fetchone()
+            send_response(addr, {"message": "Here are the host ip and port", "code": 200, "host ip": host_ip, "host port": host_port})    
     else:
         print(data["command"], data["command"] == "open room")
         send_response(addr, {"message": "Invalid command.", "code": 400})
@@ -133,11 +133,11 @@ def compare_passwords(password:bytes, hashed_password:bytes, salt:bytes):
 
 
 def login(password, email):
-    conn = sqlite3.connect("mydatabase.db")
-    c = conn.cursor()
-    c.execute("SELECT id, password FROM users WHERE email = ?", (email, ))
-    user = c.fetchone()
-    print(user)
+    with sqlite3.connect("mydatabase.db") as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, password FROM users WHERE email = ?", (email, ))
+        user = c.fetchone()
+        print(user)
     if user is not None:
         user_id, hashed_password = user
         print(user_id, hashed_password)
@@ -146,15 +146,14 @@ def login(password, email):
     return None
 
 def get_room_code(user_id):
-    connection = sqlite3.connect("mydatabase.db")
-    cursor = connection.cursor()
-    cursor.execute("SELECT room_code FROM users WHERE id=?", (user_id,))
-    room_code = cursor.fetchone()
-    if room_code:
-        room_code = room_code[0]
-    else:
-        room_code = None
-    connection.close()
+    with sqlite3.connect("mydatabase.db") as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT room_code FROM users WHERE id=?", (user_id,))
+        room_code = cursor.fetchone()
+        if room_code:
+            room_code = room_code[0]
+        else:
+            room_code = None
     return room_code
 
 def insert_room(room_code, user_id, host_ip, host_port):
