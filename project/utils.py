@@ -179,23 +179,51 @@ def get_host(room_code=""):
     return r
 
 
+def get_user_type(email):
+    data = {"command": "get type by email", "email": email}
+    r = send_data(data)
+    if r["code"] == 104:
+        r["user type"] = None
+        return r
+    return r
+
+
+def get_user_name(email):
+    data = {"command": "get type by name", "email": email}
+    r = send_data(data)
+    if r["code"] == 104:
+        r["user name"] = None
+        return r
+    return r
+    
+
 class Client:
     def __init__(self, username=None, password=None, email=None):
         if not(password is None or email is None):
-            self.username = username
+            self.username = get_user_name(email)["user name"]
             self.password = password
             self.email = email
+            self.type = get_user_type(self.email)["user type"]
             self.user_data = {"username": self.username, "password": self.password, "email": self.email}
         else:
+            self.username = None
+            self.password = None
+            self.email = None
+            self.type = "normal"
             self.user_data = None
 
     def change_user(self, username=None, password=None, email=None):
         if not(password is None or email is None):
-            self.username = username
+            self.username = get_user_name(email)["user name"]
             self.password = password
             self.email = email
+            self.type = get_user_type(self.email)["user type"]
             self.user_data = {"username": self.username, "password": self.password, "email": self.email}
         else:
+            self.username = None
+            self.password = None
+            self.email = None
+            self.type = "normal"
             self.user_data = None
 
     def activate_room(self, data={"host_ip": ip, "host_port": port}):
@@ -221,10 +249,11 @@ class Client:
 
     def get_host(self, room_code):
         return get_host(room_code)
-        
+
 
 if __name__ == "__main__":
-    print(get_port_and_ip())
+    print(get_user_name("23456789@gmail.com"))
+    # print(get_port_and_ip())
 """
     activate_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}, {"host_ip": ip, "host_port": port})
     print(get_host("XzcOnul3"))

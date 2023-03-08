@@ -106,7 +106,7 @@ font: 20pt &quot;MS Shell Dlg 2&quot;;</string>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="heading">
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:28pt; font-weight:600;&quot;&gt;Hello {name}&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:28pt; font-weight:600;&quot;&gt;You are {user_type}&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>

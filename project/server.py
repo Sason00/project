@@ -2,6 +2,7 @@ import socket
 import threading
 import sqlite3
 import hashlib
+import hmac
 import json
 import json
 import re
@@ -116,6 +117,29 @@ def handle_connection(data, addr):
             c.execute("SELECT host_ip, host_port FROM active_rooms WHERE room_code = ?", (room_code, ))
             host_ip, host_port = c.fetchone()
             send_response(addr, {"message": "Here are the host ip and port", "code": 200, "host ip": host_ip, "host port": host_port})    
+    elif data["command"] == "get type by email":
+        email = data["email"]
+        with sqlite3.connect("mydatabase.db") as conn:
+            c = conn.cursor()
+            c.execute("SELECT type FROM users WHERE email = ?", (email, ))
+            user_type = c.fetchone()
+            if not(user_type is None):
+                user_type = user_type[0]
+                send_response(addr, {"message": f"The user is {user_type}", "code": 200, "user type": user_type})    
+            else:
+                send_response(addr, {"message": "Invalid mail.", "code": 401, "user type": None})
+    elif data["command"] == "get type by name":
+        email = data["email"]
+        with sqlite3.connect("mydatabase.db") as conn:
+            c = conn.cursor()
+            c.execute("SELECT username FROM users WHERE email = ?", (email, ))
+            user_name = c.fetchone()
+            if not(user_name is None):
+                user_name = user_name[0]
+                send_response(addr, {"message": f"The username is {user_name}", "code": 200, "user name": user_name})    
+            else:
+                send_response(addr, {"message": "Invalid mail.", "code": 401, "user name": None})
+
     else:
         print(data["command"], data["command"] == "open room")
         send_response(addr, {"message": "Invalid command.", "code": 400})
@@ -128,8 +152,11 @@ def send_response(client, data):
 
 
 def compare_passwords(password:bytes, hashed_password:bytes, salt:bytes):
+    print("hi")
     salted_password = hashlib.sha256(password + salt).hexdigest().encode()
-    return salted_password == hashed_password
+    print(salted_password)
+    print(hashed_password)
+    return hmac.compare_digest(salted_password, hashed_password)
 
 
 def login(password, email):
