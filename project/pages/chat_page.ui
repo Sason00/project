@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">.QPushButton{
+   <string notr="true">QPushButton {
 	height:50%;
 	font: 16pt &quot;MS Shell Dlg 2&quot;;
 }</string>

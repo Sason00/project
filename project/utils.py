@@ -7,7 +7,6 @@ import sys
 
 """
 todo:
-make a class that wrap everything nicely
 """
 
 def get_ipv4_address():
@@ -197,10 +196,10 @@ def get_user_name(email):
     return r
     
 
-class Client:
+class BaseClient:
     def __init__(self, username=None, password=None, email=None):
         if not(password is None or email is None):
-            self.username = get_user_name(email)["user name"]
+            self.username = username
             self.password = password
             self.email = email
             self.type = get_user_type(self.email)["user type"]
@@ -214,7 +213,7 @@ class Client:
 
     def change_user(self, username=None, password=None, email=None):
         if not(password is None or email is None):
-            self.username = get_user_name(email)["user name"]
+            self.username = username
             self.password = password
             self.email = email
             self.type = get_user_type(self.email)["user type"]
@@ -250,6 +249,35 @@ class Client:
     def get_host(self, room_code):
         return get_host(room_code)
 
+
+class Client(BaseClient):
+    def __init__(self, username=None, password=None, email=None):
+        if not(password is None or email is None):
+            self.username = get_user_name(email)["user name"]
+            self.password = password
+            self.email = email
+            self.type = get_user_type(self.email)["user type"]
+            self.user_data = {"username": self.username, "password": self.password, "email": self.email}
+        else:
+            self.username = None
+            self.password = None
+            self.email = None
+            self.type = "normal"
+            self.user_data = None
+
+    def change_user(self, username=None, password=None, email=None):
+        if not(password is None or email is None):
+            self.username = get_user_name(email)["user name"]
+            self.password = password
+            self.email = email
+            self.type = get_user_type(self.email)["user type"]
+            self.user_data = {"username": self.username, "password": self.password, "email": self.email}
+        else:
+            self.username = None
+            self.password = None
+            self.email = None
+            self.type = "normal"
+            self.user_data = None
 
 if __name__ == "__main__":
     print(get_user_name("23456789@gmail.com"))

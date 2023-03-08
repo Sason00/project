@@ -14,15 +14,15 @@ print(QtCore.QCoreApplication.libraryPaths())
 
 """
 tasks:
-login
-display name and type
-create room
 """
 
 client = utils.Client(None, None, None)
 print(client.username)
 
+
 app = QApplication(sys.argv)
+with open("pages/style.css", "r") as f:
+    app.setStyleSheet(f.read())
 app.setWindowIcon(QIcon('icon.png'))
 
 loader = QUiLoader()
