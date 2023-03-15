@@ -83,10 +83,14 @@ def get_port_and_ip():
     sock.bind(("", 0))
     ip_address, port = sock.getsockname()
     sock.close()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("", 0))
+    ip_address, port2 = sock.getsockname()
+    sock.close()
     public_ip = get_ipv4_address()
-    return (public_ip, port)
+    return (public_ip, port, port2)
 
-ip, port = get_port_and_ip()
+ip, port, port2 = get_port_and_ip()
 
 def create_room_id():
     return secrets.token_urlsafe(6)
@@ -160,7 +164,7 @@ def close_room(user_data={"username": "first2", "password": "123", "email": "che
     client_socket.close()
 
 
-def activate_room(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com"}, data={"host_ip": ip, "host_port": port}):
+def activate_room(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com"}, data={"host_ip": ip, "host_port": port, "host_listener_port": port2}):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     data = {"command": "open room", "user_info": user_data, "data": data}
     response = send_data(data)
@@ -280,7 +284,8 @@ class Client(BaseClient):
             self.user_data = None
 
 if __name__ == "__main__":
-    print(get_user_name("23456789@gmail.com"))
+    print(ip, port, port2)
+    # print(get_user_name("23456789@gmail.com"))
     # print(get_port_and_ip())
 """
     activate_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}, {"host_ip": ip, "host_port": port})

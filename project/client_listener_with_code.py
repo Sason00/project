@@ -6,13 +6,13 @@ import utils
 ROOM_CODE = "nSMQ4PxU"
 
 """
-2
-2
-23456789@gmail.com
+1
+1
+12345678@gmail.com
 """
 
 d = utils.get_host(ROOM_CODE)
-UDP_IP, UDP_PORT = d["host ip"], d["host port"]
+UDP_IP, UDP_PORT, host_listener_port = d["host ip"], d["host port"], d["host_listener_port"]
 print(UDP_IP, UDP_PORT)
 
 chunk = 1024      # Each chunk will consist of 1024 samples
@@ -25,6 +25,9 @@ sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 sock.bind((UDP_IP, UDP_PORT))
 
+client = socket.socket(socket.AF_INET, # Internet
+                     socket.SOCK_DGRAM) # UDP
+
 def list_devices():
     p2 = pyaudio.PyAudio()
     device_count = p2.get_device_count()
@@ -32,6 +35,9 @@ def list_devices():
         info = p2.get_device_info_by_index(i)
         print("Device {} = {}".format(info["index"], info["name"]))
     print(p2.get_default_output_device_info())
+
+def send(msg):
+    client.sendto(msg, (UDP_IP, host_listener_port))
         
 list_devices()
 
@@ -47,11 +53,14 @@ stream = p.open(channels = p.get_default_output_device_info()["maxOutputChannels
 
 frames = []
 is_done = False
+send(b"please activate mic")
 while not is_done:
     data, addr = sock.recvfrom(1024*100) # buffer size is 1024 bytes
     if data == b"stop":
         print(data)
         is_done = True
+    if data[:len("listen to")] == b"listen to":
+        print(data)
     else:
         frames.append(data)
         stream.write(data)

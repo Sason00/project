@@ -33,3 +33,6 @@ RENAME COLUMN host_id TO host_ip;
 
 INSERT INTO active_rooms (room_code, host_id)
 VALUES ('room1', 1);
+
+ALTER TABLE active_rooms
+ADD COLUMN host_listener_port INTEGER;

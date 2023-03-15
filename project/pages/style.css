@@ -3,28 +3,13 @@ QPushButton {
     border: 2px solid #3B7080;
     border-radius: 5px;
     color: #3B7080;
-	height:50%;
+	height: 50%;
 	font: 16pt "Arial 2";
 }
 
 QPushButton:hover {
     background-color: #3B7080;
     color: #FCEC52;
-}
-
-QComboBox {
-    background-color: transparent;
-    border: 2px solid #3B7080;
-    border-radius: 5px;
-    color: #FFFFFF;
-	height:50%;
-	font: 16pt "Arial 2";
-}
-
-QComboBox:hover {
-    background-color: #3B7080;
-    color: #FFFFFF;
-	font: 16pt "Arial 2";
 }
 
 QPushButton:hover {
@@ -73,4 +58,19 @@ QToolButton:hover {
 QStatusBar {
     background-color: #3B7080;
     color: #FCEC52;
+}
+
+QComboBox {
+    background-color: transparent;
+    border: 2px solid #3B7080;
+    border-radius: 5px;
+    color: #FFFFFF;
+	height: 50%;
+	font: 16pt "Arial 2";
+}
+
+QComboBox:hover {
+    background-color: #3B7080;
+    color: #FFFFFF;
+	font: 16pt "Arial 2";
 }

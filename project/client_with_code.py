@@ -2,6 +2,7 @@ import socket
 import pyaudio
 import wave
 import utils
+import threading
 
 """
 1
@@ -11,25 +12,37 @@ import utils
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 51166
+host_listener_port = 51167
 
-r = utils.activate_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}, {"host_ip": UDP_IP, "host_port": UDP_PORT})
+r = utils.activate_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}, {"host_ip": UDP_IP, "host_port": UDP_PORT, "host_listener_port": host_listener_port})
 print(r)
 
 chunk = 1024      # Each chunk will consist of 1024 samples
 sample_format = pyaudio.paInt16      # 16 bits per sample
 channels = 1      # Number of audio channels
 fs = 44100        # Record at 44100 samples per second
-time_in_seconds = 10
+time_in_seconds = 30
 
 sock = socket.socket(socket.AF_INET, # Internet
                        socket.SOCK_DGRAM) # UDP
+
+server = socket.socket(socket.AF_INET, # Internet
+                       socket.SOCK_DGRAM) # UDP
+
+server.bind((UDP_IP, host_listener_port))
+
 
 p = pyaudio.PyAudio()  # Create an interface to PortAudio
 
 
 def send(msg):
     sock.sendto(msg, (UDP_IP, UDP_PORT))
-    
+
+def handle_connection():
+    data, addr = server.recvfrom(1024)
+    print(addr[0], addr[1])
+    if data == b"please activate mic":
+        send(b"listen to |" + addr[0].encode() + b":" + str(addr[1]).encode())
 
 def list_devices():
     p2 = pyaudio.PyAudio()
@@ -59,6 +72,11 @@ print(int(fs / chunk * time_in_seconds))
 
 # Store data in chunks for 3 seconds
 for i in range(0, int(fs / chunk * time_in_seconds)):
+    # check for connections
+    t = threading.Thread(target=handle_connection)
+    t.daemon = True
+    t.start()
+    
     data = stream.read(chunk)
     frames.append(data)
     send(data)

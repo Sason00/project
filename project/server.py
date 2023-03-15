@@ -90,7 +90,8 @@ def handle_connection(data, addr):
         room_code = get_room_code(user_id)
         host_ip = data["data"]["host_ip"]
         host_port = data["data"]["host_port"]
-        insert_room(room_code, user_id, host_ip, host_port)
+        host_listener_port = data["data"]["host_listener_port"]
+        insert_room(room_code, user_id, host_ip, host_port, host_listener_port)
         # Return success message to client
         send_response(addr, {"message": "Room successfully opened.", "code": 200})
     elif data["command"] == "close room":
@@ -114,9 +115,9 @@ def handle_connection(data, addr):
         room_code = data["room_code"]
         with sqlite3.connect("mydatabase.db") as conn:
             c = conn.cursor()
-            c.execute("SELECT host_ip, host_port FROM active_rooms WHERE room_code = ?", (room_code, ))
-            host_ip, host_port = c.fetchone()
-            send_response(addr, {"message": "Here are the host ip and port", "code": 200, "host ip": host_ip, "host port": host_port})    
+            c.execute("SELECT host_ip, host_port, host_listener_port FROM active_rooms WHERE room_code = ?", (room_code, ))
+            host_ip, host_port, host_listener_port = c.fetchone()
+            send_response(addr, {"message": "Here are the host ip and port", "code": 200, "host ip": host_ip, "host port": host_port, "host_listener_port": host_listener_port})    
     elif data["command"] == "get type by email":
         email = data["email"]
         with sqlite3.connect("mydatabase.db") as conn:
@@ -183,10 +184,10 @@ def get_room_code(user_id):
             room_code = None
     return room_code
 
-def insert_room(room_code, user_id, host_ip, host_port):
+def insert_room(room_code, user_id, host_ip, host_port, host_listener_port):
     connection = sqlite3.connect("mydatabase.db")
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO active_rooms (room_code, id, host_ip, host_port) VALUES (?, ?, ?, ?)", (room_code, user_id, host_ip, host_port))
+    cursor.execute("INSERT INTO active_rooms (room_code, id, host_ip, host_port, host_listener_port) VALUES (?, ?, ?, ?, ?)", (room_code, user_id, host_ip, host_port, host_listener_port))
     connection.commit()
 
 def get_user_type(user_id):

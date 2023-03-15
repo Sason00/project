@@ -106,22 +106,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="user_log_in_button">
+         <widget class="QPushButton" name="create_new_user_button">
           <property name="text">
-           <string>Log In</string>
+           <string>Create User</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QPushButton" name="user_log_in_button">
+        <property name="text">
+         <string>Log In</string>
+        </property>
+       </widget>
+      </item>
      </layout>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="create_new_user_button">
-      <property name="text">
-       <string>Create User</string>
-      </property>
-     </widget>
     </item>
    </layout>
   </widget>
