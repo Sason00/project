@@ -26,6 +26,8 @@ time_in_seconds = 30
 sock = socket.socket(socket.AF_INET, # Internet
                        socket.SOCK_DGRAM) # UDP
 
+clients = []
+
 server = socket.socket(socket.AF_INET, # Internet
                        socket.SOCK_DGRAM) # UDP
 
@@ -35,14 +37,22 @@ server.bind((UDP_IP, host_listener_port))
 p = pyaudio.PyAudio()  # Create an interface to PortAudio
 
 
-def send(msg):
-    sock.sendto(msg, (UDP_IP, UDP_PORT))
+def send(msg, ip, port):
+    sock.sendto(msg, (ip, port))
+
+def broadcast(msg):
+    for i in clients:
+        send(msg, i[0], i[1])
 
 def handle_connection():
     data, addr = server.recvfrom(1024)
     print(addr[0], addr[1])
     if data == b"please activate mic":
-        send(b"listen to |" + addr[0].encode() + b":" + str(addr[1]).encode())
+        broadcast(b"listen to |" + addr[0].encode() + b":" + str(addr[1]).encode())
+    elif data.startswith(b"accept me"):
+        if addr not in clients:
+            clients.append(addr)
+            send(b"connected", addr[0], addr[1])
 
 def list_devices():
     p2 = pyaudio.PyAudio()
@@ -79,7 +89,7 @@ for i in range(0, int(fs / chunk * time_in_seconds)):
     
     data = stream.read(chunk)
     frames.append(data)
-    send(data)
+    broadcast(data)
  
 # Stop and close the Stream and PyAudio
 stream.stop_stream()
@@ -89,7 +99,7 @@ p.terminate()
 print('-----Finished Recording-----')
 
 
-send("stop".encode())
+broadcast("stop".encode())
 print(utils.close_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}))
 
 """

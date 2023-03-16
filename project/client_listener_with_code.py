@@ -21,9 +21,7 @@ channels = 1      # Number of audio channels
 fs = 44100        # Record at 44100 samples per second
 time_in_seconds = 10
 
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-sock.bind((UDP_IP, UDP_PORT))
+_, PORT, _ = utils.get_port_and_ip()
 
 client = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
@@ -44,7 +42,7 @@ list_devices()
 p = pyaudio.PyAudio()  # Create an interface to PortAudio
 stream = p.open(channels = p.get_default_output_device_info()["maxOutputChannels"],
                 format=sample_format,
-                rate = fs // 2, # somehow when it's normal it 2 times faster
+                rate = fs, # somehow when it's normal it 2 times faster
                 frames_per_buffer = chunk,
                 output=True,
                 input=False,
@@ -53,9 +51,10 @@ stream = p.open(channels = p.get_default_output_device_info()["maxOutputChannels
 
 frames = []
 is_done = False
-send(b"please activate mic")
+send(b"accept me")
+print("listening")
 while not is_done:
-    data, addr = sock.recvfrom(1024*100) # buffer size is 1024 bytes
+    data, addr = client.recvfrom(1024*100) # buffer size is 1024 bytes
     if data == b"stop":
         print(data)
         is_done = True
@@ -64,8 +63,7 @@ while not is_done:
     else:
         frames.append(data)
         stream.write(data)
-    
-	
+
 stream.stop_stream()
 stream.close()
 p.terminate()
@@ -74,7 +72,7 @@ p.terminate()
 file = wave.open("output2.wav", 'wb')
 file.setnchannels(channels)
 file.setsampwidth(p.get_sample_size(sample_format))
-file.setframerate(fs)
+file.setframerate(fs // 2)
  
 #Write and Close the File
 file.writeframes(b''.join(frames))
