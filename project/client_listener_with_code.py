@@ -2,6 +2,7 @@ import socket
 import pyaudio
 import wave
 import utils
+import random
 
 ROOM_CODE = "nSMQ4PxU"
 
@@ -58,11 +59,15 @@ while not is_done:
     if data == b"stop":
         print(data)
         is_done = True
-    if data[:len("listen to")] == b"listen to":
+    if data[0] == 123 and data[-1] == 125:
         print(data)
     else:
         frames.append(data)
         stream.write(data)
+
+    if random.random() > 0.8:
+        send(b"please activate mic")
+        
 
 stream.stop_stream()
 stream.close()

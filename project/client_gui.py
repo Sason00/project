@@ -122,8 +122,16 @@ def change_window(index):
     except IndexError as e:
         print(e)
 
+
+def enter_room():
+    room_code = my_form.room_code_field.text()
+    print(room_code)
+    change_window(2)
+    
+    
+
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))
-my_form.connect_button.clicked.connect(lambda: change_window(2))
+my_form.connect_button.clicked.connect(lambda: enter_room())
 my_form.login_button.clicked.connect(lambda: change_window(3))
 
 my_form2.return_button.clicked.connect(lambda: change_window(0))

@@ -3,18 +3,22 @@ import pyaudio
 import wave
 import utils
 import threading
+import json
 
 """
 1
 1
 12345678@gmail.com
 """
-
+# parameters
 UDP_IP = "127.0.0.1"
 UDP_PORT = 51166
 host_listener_port = 51167
+# get the client object as a parameter
+client = utils.Client("1", "1", "12345678@gmail.com")
 
-r = utils.activate_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}, {"host_ip": UDP_IP, "host_port": UDP_PORT, "host_listener_port": host_listener_port})
+# define variables
+r = utils.activate_room(client.user_data, {"host_ip": UDP_IP, "host_port": UDP_PORT, "host_listener_port": host_listener_port})
 print(r)
 
 chunk = 1024      # Each chunk will consist of 1024 samples
@@ -47,12 +51,17 @@ def broadcast(msg):
 def handle_connection():
     data, addr = server.recvfrom(1024)
     print(addr[0], addr[1])
+    print(data)
     if data == b"please activate mic":
-        broadcast(b"listen to |" + addr[0].encode() + b":" + str(addr[1]).encode())
+        msg = {"msg": "listen to", "ip": addr[0], "port": addr[1]}
+        msg = json.dumps(msg)
+        broadcast(bytes(msg, encoding="utf-8"))
     elif data.startswith(b"accept me"):
         if addr not in clients:
             clients.append(addr)
-            send(b"connected", addr[0], addr[1])
+            msg = {"msg": "connected"}
+            msg = json.dumps(msg)
+            send(bytes(msg, encoding="utf-8"), addr[0], addr[1])
 
 def list_devices():
     p2 = pyaudio.PyAudio()
@@ -64,6 +73,7 @@ def list_devices():
 
 list_devices()
 
+# run, needs to run at background
 print('-----Now Recording-----')
  
 #Open a Stream with the values we just defined
@@ -74,13 +84,13 @@ stream = p.open(format=sample_format,
                 input = True,
                 output=False,
                 input_device_index=p.get_default_input_device_info()["index"])
- 
-frames = []  # Initialize array to store frames
+
 
 print(f"{fs = }, {chunk = }, {time_in_seconds = }")
 print(int(fs / chunk * time_in_seconds))
 
-# Store data in chunks for 3 seconds
+# this needs to run in the background using threadings
+frames = []  # Initialize array to store frames
 for i in range(0, int(fs / chunk * time_in_seconds)):
     # check for connections
     t = threading.Thread(target=handle_connection)
@@ -102,13 +112,12 @@ print('-----Finished Recording-----')
 broadcast("stop".encode())
 print(utils.close_room({"username": "1", "password": "1", "email": "12345678@gmail.com"}))
 
-"""
+# save recording, needs to get the file name as a parameter
 file = wave.open("output1.wav", 'wb')
 file.setnchannels(channels)
 file.setsampwidth(p.get_sample_size(sample_format))
 file.setframerate(fs)
  
-#Write and Close the File
 file.writeframes(b''.join(frames))
 file.close()
-"""
+

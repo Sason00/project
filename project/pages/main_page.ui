@@ -94,7 +94,7 @@ room</string>
        </spacer>
       </item>
       <item row="4" column="2">
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="room_code_field">
         <property name="styleSheet">
          <string notr="true">height: 35%;
 font: 48pt &quot;MS Shell Dlg 2&quot;;
