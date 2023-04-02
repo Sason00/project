@@ -42,7 +42,7 @@ class ChatSubWindow(QWidget):
         self.layout.addLayout(self.input_layout)
 
         # Add some space at the bottom
-        spacer_item = QSpacerItem(100, 100, QSizePolicy.Fixed, QSizePolicy.Fixed)
+        spacer_item = QSpacerItem(100, 100, QSizePolicy.Fixed, QSizePolicy.Expanding)
         self.layout.addItem(spacer_item)
         
         self.setLayout(self.layout)
@@ -77,6 +77,7 @@ class ChatSubWindow(QWidget):
     def closeEvent(self, event):
         self.closed.emit()
         super().closeEvent(event)
+
 
 
 class MainWindow(QMainWindow):
