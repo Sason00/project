@@ -77,6 +77,9 @@ def handle_connection(data, addr):
             send_response(addr, {"message": "Incorrect email or password", "code": 400})
     elif data["command"] == "open room":
         user_info = data["user_info"]
+        if user_info == None:
+            send_response(addr, {"message": "You are not authorized to open a room.", "code": 403})
+            return
         user_id = login(user_info["password"], user_info["email"])
         if user_id is None:
             # Return error message to client
@@ -93,9 +96,12 @@ def handle_connection(data, addr):
         host_listener_port = data["data"]["host_listener_port"]
         insert_room(room_code, user_id, host_ip, host_port, host_listener_port)
         # Return success message to client
-        send_response(addr, {"message": "Room successfully opened.", "code": 200})
+        send_response(addr, {"message": "Room successfully opened.", "code": 200, "room code": room_code})
     elif data["command"] == "close room":
         user_info = data["user_info"]
+        if user_info == None:
+            send_response(addr, {"message": "You are not authorized to open a room.", "code": 403})
+            return
         user_id = login(user_info["password"], user_info["email"])
         if user_id is None:
             # Return error message to client

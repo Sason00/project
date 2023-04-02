@@ -97,7 +97,7 @@ def create_room_id():
 
 def create_user(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com", "type": "guide"}):
     # Create the data to send
-    ip, port = get_port_and_ip()
+    ip, port, port2 = get_port_and_ip()
     data = {"command": "create user", "data": user_data} 
     # json the data
     data = json.dumps(data)
@@ -127,7 +127,7 @@ def create_user(user_data={"username": "first2", "password": "123", "email": "ch
 
 def send_login(user_data={"username": "first2", "password": "123", "email": "check6@gmail.com", "type": "guide"}):
     # Create the data to send
-    ip, port = get_port_and_ip()
+    ip, port, port2 = get_port_and_ip()
     data = {"command": "login", "data": user_data}
     # json the data
     data = json.dumps(data)
@@ -173,6 +173,7 @@ def activate_room(user_data={"username": "first2", "password": "123", "email": "
     else:
         print("Error: " + response["message"])
     client_socket.close()
+    return response
 
 
 def get_host(room_code=""):

@@ -1,11 +1,13 @@
 import sys
 import utils
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLineEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLineEdit, QMenu
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-import pages.code.main_page_copy
-import pages.code.not_a_guide_buy_license
+from pages.code import user_menu
+from pages.code import chat_menu
+import class_broadcast
+import class_listener
 
 from PySide6 import QtCore
 print(QtCore.QCoreApplication.libraryPaths())
@@ -55,8 +57,19 @@ create_user_page.open(QFile.ReadOnly)
 my_form5 = loader.load(create_user_page)
 create_user_page.close()
 
-my_form_list = [my_form, my_form2, my_form3, my_form4, my_form5]
-my_form_texts_lists = [my_form.heading.text(), my_form2.heading.text(), my_form3.heading.text()]
+user_menu_page = QFile("pages/user_menu.ui")
+user_menu_page.open(QFile.ReadOnly)
+my_form6 = loader.load(user_menu_page)
+user_menu_page.close()
+
+chat_for_guide_page = QFile("pages/chat_page_for_guide.ui")
+chat_for_guide_page.open(QFile.ReadOnly)
+my_form7 = loader.load(chat_for_guide_page)
+chat_for_guide_page.close()
+chat_for_guide_page_heading_text = "Hello, {name}"
+
+my_form_list = [my_form, my_form2, my_form3, my_form7, my_form4, my_form5]
+my_form_texts_lists = [my_form.heading.text(), my_form2.heading.text(), my_form3.heading.text(), my_form7.heading.text()]
 
 sw = QStackedWidget()
 for i in my_form_list:
@@ -127,21 +140,66 @@ def enter_room():
     room_code = my_form.room_code_field.text()
     print(room_code)
     change_window(2)
+    audio_client = class_listener.AudioClient(room_code)
+    audio_client.run()
     
+
+sub_window = None
+def open_sub_window():
+    global sub_window
+    if sub_window is None or not sub_window.isVisible():
+        sub_window = user_menu.SubWindow(sw)
+        sub_window.closed.connect(sub_window_closed)
+        sub_window.show_fullscreen()
+
+
+def sub_window_closed():
+    global sub_window
+    sub_window = None
+
+sub_chat = None
+def open_sub_chat():
+    global sub_chat
+    if sub_chat is None or not sub_chat.isVisible():
+        sub_chat = chat_menu.ChatSubWindow(sw)
+        sub_chat.closed.connect(sub_chat_closed)
+        sub_chat.show_fullscreen()
+
+
+def sub_chat_closed():
+    global sub_chat
+    sub_chat = None
+
+
+def open_room():
+    if client.type == "normal":
+        return
+    utils.close_room(client.user_data)
+    
+    change_window(3)
+
+    # Create an AudioRecorder object with the client object and parameters
+    recorder = class_broadcast.AudioRecorder(client=client, udp_ip="127.0.0.1", udp_port=51166,
+                             host_listener_port=51167)
+
+    # Start recording in the background
+    recorder.run()    
     
 
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))
 my_form.connect_button.clicked.connect(lambda: enter_room())
-my_form.login_button.clicked.connect(lambda: change_window(3))
+my_form.login_button.clicked.connect(lambda: change_window(4))
 
 my_form2.return_button.clicked.connect(lambda: change_window(0))
+my_form2.open_room_button.clicked.connect(open_room)
 
 my_form3.leave_room_button.clicked.connect(lambda: change_window(0))
+my_form3.open_chat_button.clicked.connect(open_sub_chat)
 
 my_form4.password_field.setEchoMode(QLineEdit.Password)
 my_form4.toggle_password.clicked.connect(lambda: toggle_password(my_form4))
 my_form4.user_log_in_button.clicked.connect(login)
-my_form4.create_new_user_button.clicked.connect(lambda: change_window(4))
+my_form4.create_new_user_button.clicked.connect(lambda: change_window(5))
 my_form4.return_button.clicked.connect(lambda: change_window(0))
 
 my_form5.password_field.setEchoMode(QLineEdit.Password) 
@@ -150,9 +208,11 @@ for i in ("normal", "guide"):
     my_form5.user_type_input.addItem(i)
 my_form5.toggle_password.clicked.connect(lambda: toggle_password(my_form5))
 my_form5.create_user_button.clicked.connect(create_new_user)
-my_form5.login_button.clicked.connect(lambda: change_window(3))
+my_form5.login_button.clicked.connect(lambda: change_window(4))
 my_form5.return_button.clicked.connect(lambda: change_window(0))
-    
+
+my_form7.show_users_button.clicked.connect(lambda: open_sub_window())
+
 sw.show()
 change_window(0)
 
