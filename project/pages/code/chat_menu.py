@@ -7,8 +7,15 @@ from PySide6 import QtCore
 class ChatSubWindow(QWidget):
     closed = Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, client=None):
         super().__init__(parent)
+
+        if client != None:
+            self.client = client
+        else:
+            self.client = utils.Client(None, None, None)
+
+        self.client = client
         
         self.setGeometry(0, 0, 0, 0)
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -56,6 +63,9 @@ class ChatSubWindow(QWidget):
         message = self.input_text.text()
         self.chat_log.append(f"You: {message}")
         self.input_text.clear()
+
+        if self.client != None:
+            self.client.send_msg(message)
 
     def show_fullscreen(self):
         desktop_rect = QGuiApplication.primaryScreen().availableGeometry()

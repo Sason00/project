@@ -21,7 +21,7 @@ class AudioRecorder:
         self.sample_format = pyaudio.paInt16
         self.channels = 1
         self.fs = 44100
-        self.time_in_seconds = 30
+        self.time_in_seconds = 60
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.clients = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -40,6 +40,14 @@ class AudioRecorder:
         for i in self.clients:
             self.send(msg, i[0], i[1])
 
+    def broadcast_msg(self, msg, ip, port):
+        if self.client.type == "normal":
+            return
+
+        for i in self.clients:
+            if not (i[0] == ip and i[1] == port):
+                self.send(msg, i[0], i[1])
+
     def handle_connection(self):
         if self.client.type == "normal":
             return
@@ -50,12 +58,19 @@ class AudioRecorder:
             msg = {"msg": "listen to", "ip": addr[0], "port": addr[1]}
             msg = json.dumps(msg)
             self.broadcast(bytes(msg, encoding="utf-8"))
-        elif data.startswith(b"accept me"):
-            if addr not in self.clients:
-                self.clients.append(addr)
-                msg = {"msg": "connected"}
-                msg = json.dumps(msg)
-                self.send(bytes(msg, encoding="utf-8"), addr[0], addr[1])
+        if data[0] == 123 and data[-1] == 125:
+            print(data)
+            data = json.loads(data)
+            if data["msg"] == "accept me":
+                if addr not in self.clients:
+                    self.clients.append(addr)
+                    msg = {"msg": "connected"}
+                    msg = json.dumps(msg)
+                    self.send(bytes(msg, encoding="utf-8"), addr[0], addr[1])
+            elif data["msg"] == "send msg":
+                print(data["msg content"])
+                self.broadcast_msg(data["msg content"], addr[0], addr[1])
+        
 
     def list_devices(self):
         if self.client.type == "normal":

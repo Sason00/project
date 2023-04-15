@@ -22,6 +22,8 @@ client = utils.Client(None, None, None)
 print(client.username)
 
 
+voice_client = None
+
 app = QApplication(sys.argv)
 with open("pages/style.css", "r") as f:
     app.setStyleSheet(f.read())
@@ -137,11 +139,14 @@ def change_window(index):
 
 
 def enter_room():
+    global voice_client
     room_code = my_form.room_code_field.text()
     print(room_code)
     change_window(2)
     audio_client = class_listener.AudioClient(room_code)
     audio_client.run()
+    
+    voice_client = audio_client
     
 
 sub_window = None
@@ -159,9 +164,9 @@ def sub_window_closed():
 
 sub_chat = None
 def open_sub_chat():
-    global sub_chat
+    global sub_chat, voice_client
     if sub_chat is None or not sub_chat.isVisible():
-        sub_chat = chat_menu.ChatSubWindow(sw)
+        sub_chat = chat_menu.ChatSubWindow(sw, voice_client)
         sub_chat.closed.connect(sub_chat_closed)
         sub_chat.show_fullscreen()
 
@@ -172,6 +177,7 @@ def sub_chat_closed():
 
 
 def open_room():
+    global voice_client
     if client.type == "normal":
         return
     utils.close_room(client.user_data)
@@ -183,7 +189,9 @@ def open_room():
                              host_listener_port=51167)
 
     # Start recording in the background
-    recorder.run()    
+    recorder.run()
+
+    voice_client = recorder
     
 
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))

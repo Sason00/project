@@ -4,9 +4,10 @@ import wave
 import utils
 import random
 import threading
+import json
 
 class AudioClient:
-    def __init__(self, room_code):
+    def __init__(self, room_code, client=None):
         self.room_code = room_code
         self.d = utils.get_host(self.room_code)
         self.UDP_IP, self.UDP_PORT, self.host_listener_port = self.d["host ip"], self.d["host port"], self.d["host_listener_port"]
@@ -21,6 +22,7 @@ class AudioClient:
         self.frames = []
         self.is_done = False
         self.thread = None
+
 
     def list_devices(self):
         device_count = self.p.get_device_count()
@@ -48,6 +50,7 @@ class AudioClient:
                               output=True,
                               input=False,
                               output_device_index=self.p.get_default_output_device_info()["index"])
+        msg = {"msg": "accept me"}
         self.send(b"accept me")
         print("listening")
         while not self.is_done:
@@ -60,8 +63,10 @@ class AudioClient:
             else:
                 self.frames.append(data)
                 stream.write(data)
+            """
             if random.random() > 0.8:
                 self.send(b"please activate mic")
+            """
         stream.stop_stream()
         stream.close()
         self.p.terminate()
@@ -78,6 +83,12 @@ class AudioClient:
 
     def connect(self):
         self.run()
+
+    def send_msg(self, msg):
+        msg = {"msg": "send msg", "msg content": msg}
+        msg = json.dumps(msg)
+        print(msg)
+        self.send(bytes(msg, encoding="utf-8"))
 
 if __name__ == "__main__":
     audio_client = AudioClient("nSMQ4PxU")
