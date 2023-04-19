@@ -23,6 +23,7 @@ print(client.username)
 
 
 voice_client = None
+global_room_code = None
 
 app = QApplication(sys.argv)
 with open("pages/style.css", "r") as f:
@@ -111,35 +112,37 @@ def create_new_user():
     print(r)
 
 def change_heading_text(text):
-    user_name = client.username
-    user_type = client.type
-    if user_name is None or user_type is None:
-        user_name = "anon"
-        user_type = "normal"
-    print(user_name, user_type)
-    print(text)
-    text = text.replace("{name}", user_name)
-    text = text.replace("{user_type}", user_type)
-    print(text)
+    global voice_client, global_room_code
+    try:
+        user_name = client.username
+        user_type = client.type
+        if user_name is None or user_type is None:
+            user_name = "anon"
+            user_type = "normal"
+        print(user_name, user_type)
+        text = text.replace("{name}", user_name)
+        text = text.replace("{user_type}", user_type)
+    except AttributeError as e:
+        print(e)
+    except IndexError as e:
+        print(e)
+    try:
+        print(global_room_code, "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        text = text.replace("{room_code}", str(global_room_code))
+    except Exception as e:
+        print(e)
     return text
     
 def change_window(index):
     sw.setCurrentIndex(index)
     print(index)
-    try:
-        h = my_form_texts_lists[index]
-        print(h)
-        h = change_heading_text(h)
-        print(h)
-        my_form_list[index].heading.setText(h)
-    except AttributeError as e:
-        print(e)
-    except IndexError as e:
-        print(e)
+    h = my_form_texts_lists[index]
+    h = change_heading_text(h)
+    my_form_list[index].heading.setText(h)
 
 
 def enter_room():
-    global voice_client
+    global voice_client, room_code
     room_code = my_form.room_code_field.text()
     print(room_code)
     change_window(2)
@@ -177,12 +180,10 @@ def sub_chat_closed():
 
 
 def open_room():
-    global voice_client
+    global voice_client, global_room_code
     if client.type == "normal":
         return
     utils.close_room(client.user_data)
-    
-    change_window(3)
 
     # Create an AudioRecorder object with the client object and parameters
     recorder = class_broadcast.AudioRecorder(client=client, udp_ip="127.0.0.1", udp_port=51166,
@@ -192,7 +193,11 @@ def open_room():
     recorder.run()
 
     voice_client = recorder
+    global_room_code = voice_client.room_code
+    print(global_room_code, "ggggggggggggggggggggggggggg")
     
+    change_window(3)
+
 
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))
 my_form.connect_button.clicked.connect(lambda: enter_room())
@@ -220,6 +225,7 @@ my_form5.login_button.clicked.connect(lambda: change_window(4))
 my_form5.return_button.clicked.connect(lambda: change_window(0))
 
 my_form7.show_users_button.clicked.connect(lambda: open_sub_window())
+my_form7.open_chat_button.clicked.connect(lambda: open_sub_chat())
 
 sw.show()
 change_window(0)
