@@ -34,6 +34,10 @@ class AudioClient:
     def send(self, msg):
         self.client.sendto(msg, (self.UDP_IP, self.host_listener_port))
 
+    def send_d(self, msg):
+        msg = json.dumps(msg)
+        self.send(bytes(msg, encoding="utf-8"))
+
     def run(self):
         self.thread = threading.Thread(target=self._run)
         self.thread.start()
@@ -51,7 +55,7 @@ class AudioClient:
                               input=False,
                               output_device_index=self.p.get_default_output_device_info()["index"])
         msg = {"msg": "accept me"}
-        self.send(b"accept me")
+        self.send_d(msg)
         print("listening")
         while not self.is_done:
             data, addr = self.client.recvfrom(1024 * 100)  # buffer size is 1024 bytes
@@ -86,9 +90,8 @@ class AudioClient:
 
     def send_msg(self, msg):
         msg = {"msg": "send msg", "msg content": msg}
-        msg = json.dumps(msg)
         print(msg)
-        self.send(bytes(msg, encoding="utf-8"))
+        self.send_d(msg)
 
 if __name__ == "__main__":
     audio_client = AudioClient("nSMQ4PxU")

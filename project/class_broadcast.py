@@ -44,9 +44,13 @@ class AudioRecorder:
         if self.client.type == "normal":
             return
 
+        print(self.clients)
         for i in self.clients:
-            if not (i[0] == ip and i[1] == port):
-                self.send(msg, i[0], i[1])
+            if i != (ip, port):
+                msg = {"msg": "recieved msg", "content": msg}
+                msg = json.dumps(msg)
+                print(i, msg, type(msg))
+                self.send(bytes(msg, encoding="utf-8"), i[0], i[1])
 
     def handle_connection(self):
         if self.client.type == "normal":

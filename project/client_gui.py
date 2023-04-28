@@ -136,9 +136,12 @@ def change_heading_text(text):
 def change_window(index):
     sw.setCurrentIndex(index)
     print(index)
-    h = my_form_texts_lists[index]
-    h = change_heading_text(h)
-    my_form_list[index].heading.setText(h)
+    try:
+        h = my_form_texts_lists[index]
+        h = change_heading_text(h)
+        my_form_list[index].heading.setText(h)
+    except Exception as e:
+        print(e)
 
 
 def enter_room():
