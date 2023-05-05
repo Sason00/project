@@ -8,6 +8,10 @@ import json
 
 class AudioClient:
     def __init__(self, room_code, client=None):
+        if client == None:
+            self.user_client = utils.Client(None, None, None)
+        else:
+            self.user_client = client
         self.room_code = room_code
         self.d = utils.get_host(self.room_code)
         self.UDP_IP, self.UDP_PORT, self.host_listener_port = self.d["host ip"], self.d["host port"], self.d["host_listener_port"]
@@ -54,7 +58,7 @@ class AudioClient:
                               output=True,
                               input=False,
                               output_device_index=self.p.get_default_output_device_info()["index"])
-        msg = {"msg": "accept me"}
+        msg = {"msg": "accept me", "name": self.user_client.username}
         self.send_d(msg)
         print("listening")
         while not self.is_done:

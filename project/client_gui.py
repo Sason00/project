@@ -149,7 +149,7 @@ def enter_room():
     room_code = my_form.room_code_field.text()
     print(room_code)
     change_window(2)
-    audio_client = class_listener.AudioClient(room_code)
+    audio_client = class_listener.AudioClient(room_code, client)
     audio_client.run()
     
     voice_client = audio_client
