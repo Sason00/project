@@ -4,6 +4,7 @@ import wave
 import utils
 import threading
 import json
+import random
 
 
 class AudioRecorder:
@@ -67,13 +68,30 @@ class AudioRecorder:
             data = json.loads(data)
             if data["msg"] == "accept me":
                 if addr not in self.clients:
-                    self.clients.append(addr)
+                    if data["name"] == None:
+                        rand_nums = [random.randint(1, 100) for i in range(3)]
+                        
+                        new_name = f"anon({''.join(map(lambda x: str(x), rand_nums))})"
+                        
+                        # Check if the new variable is in the last value of each tuple in the clients list
+                        while any(new_var in self.clients[-1] for tpl in self.clients):
+                            rand_nums = [random.randint(1, 100) for i in range(3)]
+                            new_name = f"anon({''.join(map(lambda x: str(x), rand_nums))})"
+                        print(new_name)
+                        name_to_add = new_name
+                    else:
+                        name_to_add = data["name"]
+                    
+                    client_to_add = (addr[0], addr[1], name_to_add)
+                    self.clients.append(client_to_add)
+                    print(self.clients)
                     msg = {"msg": "connected"}
                     msg = json.dumps(msg)
                     self.send(bytes(msg, encoding="utf-8"), addr[0], addr[1])
             elif data["msg"] == "send msg":
                 print(data["msg content"])
                 self.broadcast_msg(data["msg content"], addr[0], addr[1])
+                print(self.clients)
         
 
     def list_devices(self):
