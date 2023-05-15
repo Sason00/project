@@ -23,13 +23,13 @@ def handle_connection(data, addr):
 
     sql_injection_pattern = re.compile(r"(?:')|(?:--)|(\b(select|update|delete|insert|drop|alter)\b)")
 
-"""
-Doesn't work, check later
-    # check for SQL injection
-    if sql_injection_pattern.search(str(data)):
-        send_response(addr, {"message": "Invalid command.", "code": 400})
-        print("Possible SQL injection detected!")
-""" 
+    """
+    Doesn't work, check later
+        # check for SQL injection
+        if sql_injection_pattern.search(str(data)):
+            send_response(addr, {"message": "Invalid command.", "code": 400})
+            print("Possible SQL injection detected!")
+    """ 
     # example {"command": "create user", "data": {"username": "first2", "password": "123", "email": "check6@gmail.com", "type": "guide"}}
     # Check the command
     if data["command"] == "create user":
