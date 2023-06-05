@@ -8,7 +8,7 @@ import random
 
 
 class AudioRecorder:
-    def __init__(self, udp_ip, udp_port, host_listener_port, client):
+    def __init__(self, udp_ip, udp_port, host_listener_port, client, chat_room=None):
         self.udp_ip = udp_ip
         self.udp_port = udp_port
         self.host_listener_port = host_listener_port
@@ -29,6 +29,10 @@ class AudioRecorder:
         self.server.bind((self.udp_ip, self.host_listener_port))
         self.p = pyaudio.PyAudio()
         self.frames = []
+        self.chat_room = chat_room
+
+    def update_chat_room(self, chat_room):
+        self.chat_room = chat_room
 
     def send(self, msg, ip, port):
         if self.client.type == "normal":
@@ -45,13 +49,19 @@ class AudioRecorder:
         if self.client.type == "normal":
             return
 
+        message = msg
         print(self.clients)
         for i in self.clients:
-            if i != (ip, port):
-                msg = {"msg": "recieved msg", "content": msg}
-                msg = json.dumps(msg)
-                print(i, msg, type(msg))
-                self.send(bytes(msg, encoding="utf-8"), i[0], i[1])
+            print("send to: ", i)
+            msg = {"msg": "send msg", "content": message, "from": self.get_user_name(ip, port)}
+            msg = json.dumps(msg)
+            self.send(bytes(msg, encoding="utf-8"), i[0], i[1])
+
+    def get_user_name(self, ip, port):
+        for item in self.clients:
+            if item[0] == ip and item[1] == port:
+                return item[2]
+        return None
 
     def handle_connection(self):
         if self.client.type == "normal":
@@ -72,7 +82,7 @@ class AudioRecorder:
                         rand_nums = [random.randint(1, 100) for i in range(3)]
                         
                         new_name = f"anon({''.join(map(lambda x: str(x), rand_nums))})"
-                        
+                        new_var = random.randint(1, 100)
                         # Check if the new variable is in the last value of each tuple in the clients list
                         while any(new_var in self.clients[-1] for tpl in self.clients):
                             rand_nums = [random.randint(1, 100) for i in range(3)]
@@ -90,8 +100,10 @@ class AudioRecorder:
                     self.send(bytes(msg, encoding="utf-8"), addr[0], addr[1])
             elif data["msg"] == "send msg":
                 print(data["msg content"])
-                self.broadcast_msg(data["msg content"], addr[0], addr[1])
+                self.chat_room.add_message(f"{self.get_user_name(addr[0], addr[1])}: {data['msg content']}")
                 print(self.clients)
+                self.broadcast_msg(data["msg content"], addr[0], addr[1])
+                
         
 
     def list_devices(self):
@@ -152,7 +164,11 @@ class AudioRecorder:
                 file.setframerate(self.fs)
                 file.writeframes(b''.join(self.frames))
         except (IOError, EOFError, ValueError) as e:
-            print(f"Error occurred while saving the file: {e}") 
+            print(f"Error occurred while saving the file: {e}")
+
+    def send_msg(self, msg):
+        msg = {"msg": "send msg", "msg content": msg}
+        self.broadcast(bytes(str(msg), encoding="utf-8"))
 
 def main():
     # Create a client object

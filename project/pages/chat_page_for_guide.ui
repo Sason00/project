@@ -85,7 +85,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="1" column="0">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="copy_button">
          <property name="text">
           <string>copy</string>
          </property>

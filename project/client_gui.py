@@ -1,9 +1,10 @@
 import sys
 import utils
+import subprocess 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLineEdit, QMenu
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, Qt
 from pages.code import user_menu
 from pages.code import chat_menu
 import class_broadcast
@@ -176,6 +177,8 @@ def open_sub_chat():
         sub_chat.closed.connect(sub_chat_closed)
         sub_chat.show_fullscreen()
 
+        voice_client.update_chat_room(sub_chat)
+
 
 def sub_chat_closed():
     global sub_chat
@@ -201,6 +204,7 @@ def open_room():
     
     change_window(3)
 
+clipboard = app.clipboard()
 
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))
 my_form.connect_button.clicked.connect(lambda: enter_room())
@@ -229,7 +233,9 @@ my_form5.return_button.clicked.connect(lambda: change_window(0))
 
 my_form7.show_users_button.clicked.connect(lambda: open_sub_window())
 my_form7.open_chat_button.clicked.connect(lambda: open_sub_chat())
+my_form7.copy_button.clicked.connect(lambda: clipboard.setText(str(global_room_code)))
 
 sw.show()
 change_window(0)
+
 

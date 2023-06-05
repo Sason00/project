@@ -7,7 +7,7 @@ import threading
 import json
 
 class AudioClient:
-    def __init__(self, room_code, client=None):
+    def __init__(self, room_code, client=None, chat_room=None):
         if client == None:
             self.user_client = utils.Client(None, None, None)
         else:
@@ -26,6 +26,11 @@ class AudioClient:
         self.frames = []
         self.is_done = False
         self.thread = None
+        self.chat_room = chat_room
+
+
+    def update_chat_room(self, chat_room):
+        self.chat_room = chat_room
 
 
     def list_devices(self):
@@ -67,7 +72,19 @@ class AudioClient:
                 print(data)
                 self.is_done = True
             if data[0] == 123 and data[-1] == 125:
-                print(data)
+                # Decode the bytes object into a string
+                string_data = data.decode('utf-8')
+                string_data = string_data.replace("'", "\"")
+                print(string_data)
+
+                # Convert the string to JSON
+                json_data = json.loads(string_data)
+
+                print(json_data, type(json_data))
+                if json_data["msg"] == "send msg":
+                   if self.chat_room is not None:
+                        self.chat_room.add_message(f"{json_data['from']}: {json_data['content']}")
+                        
             else:
                 self.frames.append(data)
                 stream.write(data)

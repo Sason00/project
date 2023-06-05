@@ -9,6 +9,24 @@ import sys
 todo:
 """
 
+def copy_text(text):
+    if sys.platform.startswith('win'):  # Windows
+        subprocess.run(['clip'], input=text.strip().encode('utf-16'), check=True)
+    elif sys.platform.startswith('darwin'):  # macOS
+        subprocess.run(['pbcopy'], input=text.strip().encode('utf-8'), check=True)
+    elif sys.platform.startswith('linux'):  # Linux
+        try:
+            subprocess.run(['xclip', '-selection', 'clipboard'], input=text.strip().encode('utf-8'), check=True)
+        except FileNotFoundError:
+            try:
+                subprocess.run(['xsel', '-b'], input=text.strip().encode('utf-8'), check=True)
+            except FileNotFoundError:
+                raise Exception("Clipboard not available on this Linux distribution.")
+    else:
+        raise Exception("Unsupported platform.")
+
+
+
 def get_ipv4_address():
     try:
         system = platform.system()

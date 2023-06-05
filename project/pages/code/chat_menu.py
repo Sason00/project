@@ -59,13 +59,15 @@ class ChatSubWindow(QWidget):
         self.animation = QPropertyAnimation(self, b"geometry")
         self.animation.setDuration(500)
 
-    def send_message(self):
+    def send_message(self, msg):
         message = self.input_text.text()
-        self.chat_log.append(f"You: {message}")
         self.input_text.clear()
 
         if self.client != None:
             self.client.send_msg(message)
+
+    def add_message(self, msg):
+        self.chat_log.append(msg)
 
     def show_fullscreen(self):
         desktop_rect = QGuiApplication.primaryScreen().availableGeometry()
