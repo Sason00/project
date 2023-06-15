@@ -302,8 +302,11 @@ class Client(BaseClient):
             self.type = "normal"
             self.user_data = None
 
+
+
 if __name__ == "__main__":
-    print(ip, port, port2)
+    pass
+    # print(ip, port, port2)
     # print(get_user_name("23456789@gmail.com"))
     # print(get_port_and_ip())
 """

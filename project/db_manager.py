@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 
 # Establish a connection to the database file
-conn = sqlite3.connect('check.db')
+conn = sqlite3.connect('') # name of db file
 cursor = conn.cursor()
 
 # Function to fetch data from a table and display it in a tab

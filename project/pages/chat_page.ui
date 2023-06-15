@@ -164,9 +164,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="show_map_button">
             <property name="text">
-             <string>Open Chat</string>
+             <string>Show map</string>
             </property>
            </widget>
           </item>

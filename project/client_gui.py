@@ -7,6 +7,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt
 from pages.code import user_menu
 from pages.code import chat_menu
+from pages.code import map_menu
 import class_broadcast
 import class_listener
 
@@ -184,6 +185,20 @@ def sub_chat_closed():
     global sub_chat
     sub_chat = None
 
+sub_map = None
+def open_sub_map():
+    global sub_map
+    if sub_map is None or not sub_map.isVisible():
+        sub_map = map_menu.ChatSubWindow(sw)
+        sub_map.closed.connect(sub_map_closed)
+        sub_map.show_fullscreen()
+
+
+
+def sub_map_closed():
+    global sub_map
+    sub_map = None
+
 
 def open_room():
     global voice_client, global_room_code
@@ -215,6 +230,7 @@ my_form2.open_room_button.clicked.connect(open_room)
 
 my_form3.leave_room_button.clicked.connect(lambda: change_window(0))
 my_form3.open_chat_button.clicked.connect(open_sub_chat)
+my_form3.show_map_button.clicked.connect(open_sub_map)
 
 my_form4.password_field.setEchoMode(QLineEdit.Password)
 my_form4.toggle_password.clicked.connect(lambda: toggle_password(my_form4))
@@ -234,6 +250,7 @@ my_form5.return_button.clicked.connect(lambda: change_window(0))
 my_form7.show_users_button.clicked.connect(lambda: open_sub_window())
 my_form7.open_chat_button.clicked.connect(lambda: open_sub_chat())
 my_form7.copy_button.clicked.connect(lambda: clipboard.setText(str(global_room_code)))
+my_form7.show_map_button.clicked.connect(lambda: open_sub_map())
 
 sw.show()
 change_window(0)
