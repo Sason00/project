@@ -99,6 +99,8 @@ def login():
     client.change_user(None, password, mail)
     r = client.send_login()
     print(r)
+    if r["code"] == 201:
+        change_window(0)
 
 
 def create_new_user():
@@ -112,6 +114,7 @@ def create_new_user():
     client.change_user(None, mail, password)
     r = client.create_user(data)
     print(r)
+
 
 def change_heading_text(text):
     global voice_client, global_room_code
@@ -219,6 +222,11 @@ def open_room():
     
     change_window(3)
 
+def change_room_code():
+    new_room_code = my_form2.new_code_entry.text()
+    utils.request_to_change_room_code(new_room_code, client.user_data)
+
+
 clipboard = app.clipboard()
 
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))
@@ -227,6 +235,7 @@ my_form.login_button.clicked.connect(lambda: change_window(4))
 
 my_form2.return_button.clicked.connect(lambda: change_window(0))
 my_form2.open_room_button.clicked.connect(open_room)
+my_form2.request_new_code_button.clicked.connect(change_room_code)
 
 my_form3.leave_room_button.clicked.connect(lambda: change_window(0))
 my_form3.open_chat_button.clicked.connect(open_sub_chat)

@@ -156,11 +156,44 @@ def handle_connection(data, addr):
                 send_response(addr, {"message": f"The username is {user_name}", "code": 200, "user name": user_name})    
             else:
                 send_response(addr, {"message": "Invalid mail.", "code": 401, "user name": None})
+    elif data["command"] == "update room code":
+        user_info = data["user_info"]
+        new_room_code = data["new_room_code"]
+        if len(new_room_code) == 0:
+            send_response(addr, {"message": "Invalid room code.", "code": 401})
+        changed = update_room_code(new_room_code, user_info["email"], user_info["password"])
+        if changed:
+            send_response(addr, {"message": "A matching record was found. No updates needed.", "code": 401})
+            print("A matching record was found. No updates needed.")
+        else:
+            send_response(addr, {"message": "Room code updated successfully.", "code": 201})
+            print("Room code updated successfully.")
 
     else:
         print(data["command"], data["command"] == "open room")
         send_response(addr, {"message": "Invalid command.", "code": 400})
         print("Invalid command.")
+
+
+def update_room_code(new_room_code, email, password):
+    print(new_room_code, email, password)
+    result = None
+    # Connect to the SQLite database using the "with" statement
+    with sqlite3.connect('mydatabase.db') as conn:
+        cursor = conn.cursor()
+        # Check if the room_code exists for the given mail and password
+        user_id = login(password, email)
+        if user_id:
+            cursor.execute("SELECT * FROM users WHERE room_code = ?", (new_room_code,))
+            result = cursor.fetchone()
+            print(result, bool(result))
+
+            if not bool(result):
+                # No matching records found, update the room_code
+                cursor.execute("UPDATE users SET room_code = ? WHERE id = ?", (new_room_code, user_id))
+                conn.commit()
+
+    return bool(result)
 
 
 def send_response(client, data):

@@ -129,7 +129,7 @@ class AudioRecorder:
                              input_device_index=self.p.get_default_input_device_info()["index"])
         print(f"{self.fs=}, {self.chunk=}, {self.time_in_seconds=}")
         self.frames = []  
-        for i in range(0, int(self.fs / self.chunk * self.time_in_seconds)):
+        while True:
             t = threading.Thread(target=self.handle_connection)
             t.daemon = True
             t.start()

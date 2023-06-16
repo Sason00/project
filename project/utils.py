@@ -193,6 +193,17 @@ def activate_room(user_data={"username": "first2", "password": "123", "email": "
     client_socket.close()
     return response
 
+def request_to_change_room_code(new_room_code="123456", user_data={"username": "first2", "password": "123", "email": "check6@gmail.com"}, data={"host_ip": ip, "host_port": port, "host_listener_port": port2}):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    data = {"command": "update room code", "user_info": user_data, "new_room_code": new_room_code}
+    response = send_data(data)
+    if response["code"] == 201:
+        print("Room code successfully changed.")
+    else:
+        print("Error: " + response["message"])
+    client_socket.close()
+    return response
+
 
 def get_host(room_code=""):
     data = {"command": "get host by code", "room_code": room_code}
