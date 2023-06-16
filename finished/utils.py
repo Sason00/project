@@ -9,7 +9,7 @@ import sys
 todo:
 """
 
-SERVER_IP = ""
+SERVER_IP = "192.168.1.7"
 SERVER_PORT = 5005
 
 def copy_text(text):

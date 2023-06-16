@@ -210,7 +210,8 @@ def open_room():
     utils.close_room(client.user_data)
 
     # Create an AudioRecorder object with the client object and parameters
-    recorder = class_broadcast.AudioRecorder(client=client, udp_ip="127.0.0.1", udp_port=51166,
+    ip, port1, port2 = utils.get_port_and_ip()
+    recorder = class_broadcast.AudioRecorder(client=client, udp_ip=ip, udp_port=51166,
                              host_listener_port=51167)
 
     # Start recording in the background

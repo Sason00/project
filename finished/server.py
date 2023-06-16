@@ -12,7 +12,7 @@ import utils
 todo list:
 """
 
-SERVER_IP = ""
+SERVER_IP = "192.168.1.7"
 SERVER_PORT = 5005
 
 salt = b'your_salt'
@@ -104,6 +104,7 @@ def handle_connection(data, addr):
             return
         room_code = get_room_code(user_id)
         host_ip = data["data"]["host_ip"]
+        print()
         host_port = data["data"]["host_port"]
         host_listener_port = data["data"]["host_listener_port"]
         insert_room(room_code, user_id, host_ip, host_port, host_listener_port)
