@@ -134,9 +134,9 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
-        <widget class="QPushButton" name="leave_room_button">
+        <widget class="QPushButton" name="close_room_button">
          <property name="text">
-          <string>Leave room</string>
+          <string>Close room</string>
          </property>
         </widget>
        </item>

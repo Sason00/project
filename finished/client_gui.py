@@ -2,7 +2,7 @@ import sys
 import utils
 import subprocess 
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLineEdit, QMenu
+from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLineEdit, QMenu, QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Qt
 from pages.code import user_menu
@@ -23,6 +23,28 @@ tasks:
 client = utils.Client(None, None, None)
 print(client.username)
 
+class ChangeUsernameDialog(QDialog):
+    def __init__(self, ):
+        super().__init__()
+        self.setWindowTitle("Change Username")
+
+        layout = QVBoxLayout()
+
+        # Create a label and line edit for input
+        self.label = QLabel("Enter new username:")
+        self.line_edit = QLineEdit()
+
+        # Create a button to accept the input
+        self.button = QPushButton("OK")
+        self.button.clicked.connect(self.accept)
+
+        # Add widgets to the layout
+        layout.addWidget(self.label)
+        layout.addWidget(self.line_edit)
+        layout.addWidget(self.button)
+
+        # Set the layout for the dialog
+        self.setLayout(layout)
 
 voice_client = None
 global_room_code = None
@@ -227,7 +249,30 @@ def change_room_code():
     new_room_code = my_form2.new_code_entry.text()
     utils.request_to_change_room_code(new_room_code, client.user_data)
 
+def ask_to_change_name():
+    dialog = ChangeUsernameDialog()
+    if dialog.exec() == 1:
+        # Retrieve the new username
+        new_username = dialog.line_edit.text()
+        voice_client.send_change_name(new_username)
 
+
+def leave_room():
+    global voice_client
+    voice_client.is_done = True
+    change_window(0)
+    del voice_client
+    voice_client = None
+
+def close_room():
+    global voice_client
+    voice_client.is_done = True
+    voice_client.broadcast("stop".encode())
+    utils.close_room(client.user_data)
+    change_window(0)
+    del voice_client
+    voice_client = None
+    
 clipboard = app.clipboard()
 
 my_form.create_new_room_button.clicked.connect(lambda: change_window(1))
@@ -238,9 +283,10 @@ my_form2.return_button.clicked.connect(lambda: change_window(0))
 my_form2.open_room_button.clicked.connect(open_room)
 my_form2.request_new_code_button.clicked.connect(change_room_code)
 
-my_form3.leave_room_button.clicked.connect(lambda: change_window(0))
+my_form3.leave_room_button.clicked.connect(leave_room)
 my_form3.open_chat_button.clicked.connect(open_sub_chat)
 my_form3.show_map_button.clicked.connect(open_sub_map)
+my_form3.change_name_button.clicked.connect(ask_to_change_name)
 
 my_form4.password_field.setEchoMode(QLineEdit.Password)
 my_form4.toggle_password.clicked.connect(lambda: toggle_password(my_form4))
@@ -261,6 +307,7 @@ my_form7.show_users_button.clicked.connect(lambda: open_sub_window())
 my_form7.open_chat_button.clicked.connect(lambda: open_sub_chat())
 my_form7.copy_button.clicked.connect(lambda: clipboard.setText(str(global_room_code)))
 my_form7.show_map_button.clicked.connect(lambda: open_sub_map())
+my_form7.close_room_button.clicked.connect(close_room)
 
 sw.show()
 change_window(0)

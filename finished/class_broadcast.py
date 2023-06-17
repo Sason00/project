@@ -71,6 +71,17 @@ class AudioRecorder:
             if item[0] == ip and item[1] == port:
                 return item[2]
         return None
+    
+    def get_user_index(self, ip, port):
+        for index, item in enumerate(self.clients):
+            if item[0] == ip and item[1] == port:
+                return index
+        return None
+
+    def remove_user(self, index):
+        print(self.clients[index])
+        self.send("stop".encode(), self.clients[index][0], self.clients[index][1])
+        del self.clients[index]
 
     def handle_connection(self):
         if self.client.type == "normal":
@@ -78,10 +89,7 @@ class AudioRecorder:
         data, addr = self.server.recvfrom(1024)
         print(addr[0], addr[1])
         print(data)
-        if data == b"please activate mic":
-            msg = {"msg": "listen to", "ip": addr[0], "port": addr[1]}
-            msg = json.dumps(msg)
-            self.broadcast(bytes(msg, encoding="utf-8"))
+
         if data[0] == 123 and data[-1] == 125:
             print(data)
             data = json.loads(data)
@@ -101,7 +109,7 @@ class AudioRecorder:
                     else:
                         name_to_add = data["name"]
                     
-                    client_to_add = (addr[0], addr[1], name_to_add)
+                    client_to_add = [addr[0], addr[1], name_to_add]
                     self.clients.append(client_to_add)
                     print(self.clients)
                     msg = {"msg": "connected"}
@@ -112,8 +120,8 @@ class AudioRecorder:
                 self.chat_room.add_message(f"{self.get_user_name(addr[0], addr[1])}: {data['msg content']}")
                 print(self.clients)
                 self.broadcast_msg(data["msg content"], addr[0], addr[1])
-                
-        
+            elif data["msg"] == "change name":
+                self.clients[self.get_user_index(addr[0], addr[1])][-1] = data["new name"]   
 
     def list_devices(self):
         if self.client.type == "normal":
@@ -137,8 +145,9 @@ class AudioRecorder:
                              output=False,
                              input_device_index=self.p.get_default_input_device_info()["index"])
         print(f"{self.fs=}, {self.chunk=}, {self.time_in_seconds=}")
-        self.frames = []  
-        while True:
+        self.frames = []
+        self.is_done = False
+        while not self.is_done:
             t = threading.Thread(target=self.handle_connection)
             t.daemon = True
             t.start()

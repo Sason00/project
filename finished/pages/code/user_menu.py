@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QListWidget
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QListWidget, QMenu
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtCore import Qt, QObject, Signal, QPropertyAnimation, QPoint, QRect, QEasingCurve, QTimer
 from PySide6 import QtCore
@@ -21,16 +21,24 @@ class SubWindow(QWidget):
         vbox.addWidget(close_btn)
 
         self.list_widget = QListWidget()
+        vbox.addWidget(self.list_widget)
+        self.list_widget.itemClicked.connect(self.remove_user)
         last_indices = [t[-1] for t in client.clients]
+        self.client = client
         print(client.clients)
         if client != None:
             if len(client.clients) !=0:
                 self.list_widget.addItems(last_indices)
-        vbox.addWidget(self.list_widget)
 
         # Create the animation object
         self.animation = QPropertyAnimation(self, b"geometry")
         self.animation.setDuration(500)
+
+    def remove_user(self, current_item):
+        if current_item is not None:
+            selected_item_index = self.list_widget.row(current_item)
+            print(selected_item_index)
+            self.client.remove_user(selected_item_index)
 
     def show_fullscreen(self):
         desktop_rect = QGuiApplication.primaryScreen().availableGeometry()

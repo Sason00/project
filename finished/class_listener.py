@@ -5,6 +5,8 @@ import utils
 import random
 import threading
 import json
+import tkinter as tk
+from tkinter import messagebox
 
 class AudioClient:
     def __init__(self, room_code, client=None, chat_room=None):
@@ -71,6 +73,15 @@ class AudioClient:
             if data == b"stop":
                 print(data)
                 self.is_done = True
+                popup_window = tk.Toplevel()
+                popup_window.withdraw()  # Hide the window initially
+
+                # Show the popup
+                messagebox.showinfo("Room was closed", "Room was closed")
+
+                # Run the popup window's event loop
+                popup_window.mainloop()
+
             if data[0] == 123 and data[-1] == 125:
                 # Decode the bytes object into a string
                 string_data = data.decode('utf-8')
@@ -111,6 +122,11 @@ class AudioClient:
 
     def send_msg(self, msg):
         msg = {"msg": "send msg", "msg content": msg}
+        print(msg)
+        self.send_d(msg)
+
+    def send_change_name(self, new_name):
+        msg = {"msg": "change name", "new name": new_name}
         print(msg)
         self.send_d(msg)
 
