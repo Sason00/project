@@ -162,9 +162,9 @@ def enter_room():
 
 sub_window = None
 def open_sub_window():
-    global sub_window
+    global sub_window, voice_client
     if sub_window is None or not sub_window.isVisible():
-        sub_window = user_menu.SubWindow(sw)
+        sub_window = user_menu.SubWindow(sw, voice_client)
         sub_window.closed.connect(sub_window_closed)
         sub_window.show_fullscreen()
 

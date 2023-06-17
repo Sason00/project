@@ -7,7 +7,7 @@ from PySide6 import QtCore
 class SubWindow(QWidget):
     closed = Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, client=None):
         super().__init__(parent)
         
         self.setGeometry(0, 0, 0, 0)
@@ -21,7 +21,11 @@ class SubWindow(QWidget):
         vbox.addWidget(close_btn)
 
         self.list_widget = QListWidget()
-        self.list_widget.addItems(['Item 1', 'Item 2', 'Item 3', 'Item 4'])
+        last_indices = [t[-1] for t in client.clients]
+        print(client.clients)
+        if client != None:
+            if len(client.clients) !=0:
+                self.list_widget.addItems(last_indices)
         vbox.addWidget(self.list_widget)
 
         # Create the animation object

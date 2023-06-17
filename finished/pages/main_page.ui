@@ -47,8 +47,7 @@
            <string notr="true"/>
           </property>
           <property name="text">
-           <string>Create new 
-room</string>
+           <string>Open room</string>
           </property>
          </widget>
         </item>

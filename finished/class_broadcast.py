@@ -58,10 +58,11 @@ class AudioRecorder:
             self.send(bytes(msg, encoding="utf-8"), i[0], i[1])
 
     def send_msg(self, msg):
-        self.chat_room.add_message(f"{self.client.username}: {msg}")
+        message = msg
+        self.chat_room.add_message(f"{self.client.username}: {message}")
         for i in self.clients:
             print("send to: ", i)
-            msg = {"msg": "send msg", "content": msg, "from": self.client.username}
+            msg = {"msg": "send msg", "content": message, "from": self.client.username}
             msg = json.dumps(msg)
             self.send(bytes(msg, encoding="utf-8"), i[0], i[1])
 
