@@ -1,0 +1,76 @@
+QPushButton {
+    background-color: transparent;
+    border: 2px solid #3B7080;
+    border-radius: 5px;
+    color: #3B7080;
+	height: 50%;
+	font: 16pt "Arial 2";
+}
+
+QPushButton:hover {
+    background-color: #3B7080;
+    color: #FCEC52;
+}
+
+QPushButton:hover {
+    background-color: #3B7080;
+    color: #FCEC52;
+}
+
+QWidget {
+    background-color: #FCEC52;
+    color: #3B7080;
+}
+
+QMainWindow {
+    background-color: #FCEC52;
+}
+
+QMenuBar {
+    background-color: #3B7080;
+    color: #FCEC52;
+}
+
+QMenuBar::item {
+    background-color: transparent;
+}
+
+QMenuBar::item:selected {
+    background-color: #FCEC52;
+}
+
+QToolBar {
+    background-color: #3B7080;
+    color: #FCEC52;
+}
+
+QToolButton {
+    background-color: transparent;
+    border: none;
+    color: #3B7080;
+}
+
+QToolButton:hover {
+    background-color: #FCEC52;
+    color: #3B7080;
+}
+
+QStatusBar {
+    background-color: #3B7080;
+    color: #FCEC52;
+}
+
+QComboBox {
+    background-color: transparent;
+    border: 2px solid #3B7080;
+    border-radius: 5px;
+    color: #FFFFFF;
+	height: 50%;
+	font: 16pt "Arial 2";
+}
+
+QComboBox:hover {
+    background-color: #3B7080;
+    color: #FFFFFF;
+	font: 16pt "Arial 2";
+}
